@@ -1,251 +1,564 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="pl">
+
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/all.min.css">
-    <link rel="stylesheet" href="styles.css"> 
-    <link rel="stylesheet" href="stylesRestults.css">
-    <title>Techniki Internetowe</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <meta charset="UTF-8">
+    <link href="googleStyle.css" rel="stylesheet" />
+    <link href="googleResultsStyle.css" rel="stylesheet" />
+    <link href="ListingResultsStyle.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="title_logo.svg" />
+
+    <script type="text/javascript" src="vue.js"></script>
+    <script src="cities.js"></script>
+    <title>Google</title>
 
 </head>
-<body >
-    <section>
-    <div id="app">
-        
-        <nav>
-            <ul class="ul1" >
-                
-                <li style="margin-top: 15px;"><button class="button" style="color: white; margin-top: 16px;">Zaloguj się</button></li>
-                <li style="margin-top: 35px;"><a><div class="icon"><img src="dots.png" height="20" width="20" style=" position: relative; top: 5px;"/></div></a></li>
-                <li class="li nav1"><a>Grafika</a></li>
-                <li class="li nav2"><a>Gmail</a></li>
-                <li class="li2 nav3"><img src="google.png"  width="92" style="margin-top: 10px; margin-left: 10px; margin-right: 50px;"/></li>
-                <li class="li2 nav3"><div class="input">
+
+<body class="home">
+    <div id="app" :class="{results : isActive()}">
+
+        <header>
+            <div class="h-flex-cont">
+                <section class="h-flex-item links">
+                    <a class="clean-dark-link" href="https://mail.google.com/mail/&ogbl">Gmail</a>
+                    <a class="clean-dark-link" href="https://www.google.pl/imghp?hl=pl&ogbl">Grafika</a>
+                </section>
+                <div class=" top_stripe">
+                <section class="m-flex-item stripe-flex">
+                    <div class="inside">
+                        <img class="inputIcon hidden" src="Grafiki/search.svg" :class="{visible :  focused}"/>
+                        <input class="inputSearch" ref="top" v-model="googleSearch"  type="text"
+                            aria-label="Szukaj" maxlength="2048" @focus="focused = true"
+                            @blur="focused = false"/>
+                        <div class="X">
+
+                            <img title="Wyczyść" class="inputIcon-clear" src="Grafiki/clear.svg" aria-label="Wyczyść"
+                                role="button" />
+                            <span class="line"></span>
+                        </div>
+                        <img title="Narzędzia do wprowadzania tekstu" class="inputIcon-keyboard"
+                            src="Grafiki/keyboard.svg" aria-label="Narzędzia do wprowadzania tekstu" role="button" />
+                        <button id="SearchButton" type="submit" aria-label="Szukaj w Google"><img class="inputIcon"
+                                src="Grafiki/search_blue.svg" /></button>
+                    </div>
+                    <div  id="cityNTop" class="cityNames" :class="{visible : googleSearch.length > 0 /*&& focused*/ && filteredCities.length>0}" >
+                        <ul >
+                            <li  v-for="(city,index) in filteredCities" >
+                                <div class="listElement">
+                                    <img class="inputIcon" src="Grafiki/search.svg" />
+                                    <a href="#" v-html="boldenize(city)" v-on:click="selected(index)"><b>{{ city }}</b></a>
+                                    
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                     
-                    <input list="resultsCities" type="text" maxlength="2048" name="fname" style="margin-left: 10px;" v-model="inputHandler">
-                    
-                    <span><img src="keyboard.png" height="24" /></span>
-                    <span><img src="microphone.png" height="24" style="margin-left: 15px;"/></span>
-                    <span ><img src="look.png" height="24" style="margin-left: 5px;"/></span>
-                </div></li>
-            </ul>
-            <ul>
-                <li v-for="item in findCity" :key="item.name">
-                  {{ item.name }}
-                </li>
-              </ul>
-        </nav>
-        <div class="content">
-            <p><img src="google.png"  width="272"/></p>
-            <div class="input">
-                <span ><img src="look.png" height="24"/></span>
-                <input  type="text" maxlength="2048" name="fname" v-model="inputHandler">
+                </section>
+            </div>
+                <section class="h-flex-item app">
+                    <a class="app" title="Aplikacje Google" href="https://www.google.pl/intl/pl/about/products"
+                        aria-label="Aplikacje Google"><img class="app" src="Grafiki/aplikacje.svg" /></a>
+
+                    <a class="blue-button"
+                        href="https://accounts.google.com/ServiceLogin?hl=pl&amp;passive=true&amp;continue=https://www.google.com/&amp;ec=GAZAmgQ">Zaloguj
+                        się</a>
+                </section>
+            </div>
+            <div class="navigation">
+                <section class="referance active">Wszystko</section>
+                <section class="referance">Grafika</section>
+                <section class="referance">Mapy</section>
+                <section class="referance">Wiadomości</section>
+                <section class="referance">Wideo</section>
+                <section class="referance">Więcej</section>
+                <section class="referance">Ustawienia</section>
+                <section class="referance">Narzędzia</section>
+
+            </div>
+        </header>
+
+        <main>
+
+            <div class="m-flex-cont">
                 
-                <span><img src="keyboard.png" height="24" /></span>
-                <span><img src="microphone.png" height="24" style="margin-left: 15px;"/></span>
+                <div class="searches-time">Około 151 000 000 wyników (0,51 s)</div>
+                <section class="m-flex-item"><a id="ggl-main-link"
+                        href="https://www.google.com/webhp?hl=pl&sa=X&ved=0ahUKEwj4qcOGvtPvAhWPtYsKHYjEAlgQPAgI"
+                        title="Przejdź do strony głównej Google"><img class="googleLogo" alt="Google"
+                            src="Grafiki/Google-Logo.png" /></a></section>
+                <form class="search" action="/search">
+                    <section class="m-flex-item stripe-flex from_main" >
+                        <div class="inside">
+
+                            <img class="inputIcon" src="Grafiki/search.svg" />
+                            <input class="inputSearch" ref="bottom" type="text" aria-label="Szukaj" maxlength="2048"
+                                v-model="googleSearch" placeholder="Szukaj" @focus="focused = true"
+                                @blur="focused = false" @keyup.enter="enterClicked()"/>
+                            <img title="Wyczyść" class="inputIcon-clear" src="Grafiki/clear.svg" aria-label="Wyczyść"
+                                role="button" />
+                            <img title="Narzędzia do wprowadzania tekstu" class="inputIcon-keyboard"
+                                src="Grafiki/keyboard.svg" aria-label="Narzędzia do wprowadzania tekstu"
+                                role="button" />
+ 
+                        </div>
+                        <div  id="cityNBottom" class="cityNames" :class="{visible : googleSearch.length > 0 /*&& focused*/ && filteredCities.length>0}" >
+                            <ul >
+                                <li  v-for="(city,index) in filteredCities" >
+                                    <div class="listElement">
+                                        <img class="inputIcon" src="Grafiki/search.svg" />
+                                        <a href="#" v-html="boldenize(city)" v-on:click="selected(index)"><b>{{ city }}</b></a>
+                                        
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </section>
+                    
+
+                </form>
+                <div class="m-flex-item greyButtons" :class="{hidden : googleSearch.length > 0 && focused && filteredCities.length>0}">
+                    <input class="grey-button sub" type="submit" value="Szukaj w Google" />
+                    <input class="grey-button" type="submit" value="Szczęśliwy traf" />
+                </div>
             </div>
-            
-            <div>
-                <button>Szukaj w Google</button>
-                <button>Szczęśliwy traf</button>
+            <div class="listing">
+                <div class="searches">
+                    <div class="basic">
+                        <a href="#" class="URL">
+                            <div>
+                                <span class="top_URL"><span class="dark_URL">developers.google.com</span><span
+                                        class="light_URL"> > advanced > good-titles-snippets </span><span
+                                        class="triangle"></span></span>
+                                <br />
+                                <h1 class="original_link visited">Jak tworzyć dobre tytuły i krótkie opisy w wynikach...
+                                </h1>
+                            </div>
+                        </a>
+                        <div class="content">
+                            <span>Gdy już znamy zapytanie użytkownika, możemy często znaleźć inny
+                                <em>tekst</em> na stronie, ... daj nam znać na naszym Forum pomocy Centrum
+                                <em>wyszukiwarki</em> Google.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="basic">
+                        <a href="#" class="URL">
+                            <div>
+                                <span class="top_URL"><span class="dark_URL">developers.google.com</span><span
+                                        class="light_URL"> > advanced > good-titles-snippets </span><span
+                                        class="triangle"></span></span>
+                                <br />
+                                <h1 class="original_link visited">Jak tworzyć dobre tytuły i krótkie opisy w wynikach...
+                                </h1>
+                            </div>
+                        </a>
+                        <div class="content">
+                            <span><span class="date">23 gru 2018 - </span>Gdy już znamy zapytanie użytkownika, możemy
+                                często
+                                znaleźć inny
+                                <em>tekst</em> na stronie, ... daj nam znać na naszym Forum pomocy Centrum
+                                <em>wyszukiwarki</em> Google.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="basic">
+                        <a href="#" class="URL">
+                            <div>
+                                <span class="top_URL"><span class="dark_URL">developers.google.com</span><span
+                                        class="light_URL"> > advanced > good-titles-snippets </span><span
+                                        class="triangle"></span></span>
+                                <br />
+                                <h1 class="original_link visited">Jak tworzyć dobre tytuły i krótkie opisy w wynikach...
+                                </h1>
+                            </div>
+                        </a>
+                        <div class="content">
+                            <span><span class="date">23 gru 2018 - </span>Gdy już znamy zapytanie użytkownika, możemy
+                                często
+                                znaleźć inny
+                                <em>tekst</em> na stronie, ... daj nam znać na naszym Forum pomocy Centrum
+                                <em>wyszukiwarki</em> Google.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="basic">
+                        <a href="#" class="URL">
+                            <div>
+                                <span class="top_URL"><span class="dark_URL">developers.google.com</span><span
+                                        class="light_URL"> > advanced > good-titles-snippets </span><span
+                                        class="triangle"></span></span>
+                                <br />
+                                <h1 class="original_link visited">Jak tworzyć dobre tytuły i krótkie opisy w wynikach...
+                                </h1>
+                            </div>
+                        </a>
+                        <div class="content">
+                            <span><span class="date">23 gru 2018 - </span>Gdy już znamy zapytanie użytkownika, możemy
+                                często
+                                znaleźć inny
+                                <em>tekst</em> na stronie, ... daj nam znać na naszym Forum pomocy Centrum
+                                <em>wyszukiwarki</em> Google.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="basic">
+                        <a href="#" class="URL">
+                            <div>
+                                <span class="top_URL"><span class="dark_URL">developers.google.com</span><span
+                                        class="light_URL"> > advanced > good-titles-snippets </span><span
+                                        class="triangle"></span></span>
+                                <br />
+                                <h1 class="original_link visited">Jak tworzyć dobre tytuły i krótkie opisy w wynikach...
+                                </h1>
+                            </div>
+                        </a>
+                        <div class="content">
+                            <span><span class="date">23 gru 2018 - </span>Gdy już znamy zapytanie użytkownika, możemy
+                                często
+                                znaleźć inny
+                                <em>tekst</em> na stronie, ... daj nam znać na naszym Forum pomocy Centrum
+                                <em>wyszukiwarki</em> Google.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="basic">
+                        <a href="#" class="URL">
+                            <div>
+                                <span class="top_URL"><span class="dark_URL">developers.google.com</span><span
+                                        class="light_URL"> > advanced > good-titles-snippets </span><span
+                                        class="triangle"></span></span>
+                                <br />
+                                <h1 class="original_link visited">Jak tworzyć dobre tytuły i krótkie opisy w wynikach...
+                                </h1>
+                            </div>
+                        </a>
+                        <div class="content">
+                            <span><span class="date">23 gru 2018 - </span>Gdy już znamy zapytanie użytkownika, możemy
+                                często
+                                znaleźć inny
+                                <em>tekst</em> na stronie, ... daj nam znać na naszym Forum pomocy Centrum
+                                <em>wyszukiwarki</em> Google.
+                            </span>
+                        </div>
+                    </div>
+                    <div class="basic">
+                        <a href="#" class="URL">
+                            <div>
+                                <span class="top_URL"><span class="dark_URL">developers.google.com</span><span
+                                        class="light_URL"> > advanced > good-titles-snippets </span><span
+                                        class="triangle"></span></span>
+                                <br />
+                                <h1 class="original_link visited">Jak tworzyć dobre tytuły i krótkie opisy w wynikach...
+                                </h1>
+                            </div>
+                        </a>
+                        <div class="content">
+                            <span><span class="date">23 gru 2018 - </span>Gdy już znamy zapytanie użytkownika, możemy
+                                często
+                                znaleźć inny
+                                <em>tekst</em> na stronie, ... daj nam znać na naszym Forum pomocy Centrum
+                                <em>wyszukiwarki</em> Google.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="similar">
+                    <h3>Podobne wyszukiwania</h3>
+                    <div class="flex-container">
+                        <div class="cont_central">
+                            <a href="#">
+                                <img class="inputIcon SearchIcon" src="Grafiki/search.svg" />
+                                <span><b>bootstrap 4 sticky-top column</b></span>
+                            </a>
+                            <a href="#">
+                                <img class="inputIcon SearchIcon" src="Grafiki/search.svg" />
+                                <span><b>bootstrap 4 sticky-top column</b></span>
+                            </a>
+                            <a href="#">
+                                <img class="inputIcon SearchIcon" src="Grafiki/search.svg" />
+                                <span><b>bootstrap 4 sticky-top column</b></span>
+                            </a>
+                            <a href="#">
+                                <img class="inputIcon SearchIcon" src="Grafiki/search.svg" />
+                                <span><b>bootstrap 4 sticky-top column</b></span>
+                            </a>
+                        </div>
+
+                        <div class="cont_central">
+                            <a href="#">
+                                <img class="inputIcon SearchIcon" src="Grafiki/search.svg" />
+                                <span><b>bootstrap 4 sticky-top column</b></span>
+                            </a>
+                            <a href="#">
+                                <img class="inputIcon SearchIcon" src="Grafiki/search.svg" />
+                                <span><b>bootstrap 4 sticky-top column</b></span>
+                            </a>
+                            <a href="#">
+                                <img class="inputIcon SearchIcon" src="Grafiki/search.svg" />
+                                <span><b>bootstrap 4 sticky-top column</b></span>
+                            </a>
+                            <a href="#">
+                                <img class="inputIcon SearchIcon" src="Grafiki/search.svg" />
+                                <span><b>bootstrap 4 sticky-top column</b></span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="cont_central">
+                        <table class="ggl_table">
+                            <tr>
+                                <td>
+                                    <a href="#">
+                                        <div class="cont_central">
+                                            <div class="letter Blue arrow">
+                                                < </div>
+                                                    <div class="number">Poprzednia</div>
+                                            </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="cont_central">
+                                        <div class="letter Blue">G</div>
+                                        <div class="number"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a class="This_page" href="#">
+                                        <div class="cont_central">
+                                            <div class="letter Red">o</div>
+                                            <div class="number This_page">1</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#">
+                                        <div class="cont_central">
+                                            <div class="letter Yellow">o</div>
+                                            <div class="number">2</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#">
+                                        <div class="cont_central">
+                                            <div class="letter Yellow">o</div>
+                                            <div class="number">3</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#">
+                                        <div class="cont_central">
+                                            <div class="letter Yellow">o</div>
+                                            <div class="number">4</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#">
+                                        <div class="cont_central">
+                                            <div class="letter Yellow">o</div>
+                                            <div class="number">5</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#">
+                                        <div class="cont_central">
+                                            <div class="letter Yellow">o</div>
+                                            <div class="number">6</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#">
+                                        <div class="cont_central">
+                                            <div class="letter Yellow">o</div>
+                                            <div class="number">7</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#">
+                                        <div class="cont_central">
+                                            <div class="letter Yellow">o</div>
+                                            <div class="number">8</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#">
+                                        <div class="cont_central">
+                                            <div class="letter Yellow">o</div>
+                                            <div class="number">9</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="#">
+                                        <div class="cont_central">
+                                            <div class="letter Yellow">o</div>
+                                            <div class="number">10</div>
+                                        </div>
+                                    </a>
+                                </td>
+                                <td>
+                                    <div class="cont_central">
+                                        <div class="letter Blue">g</div>
+                                        <div class="number"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cont_central">
+                                        <div class="letter Green">l</div>
+                                        <div class="number"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="cont_central">
+                                        <div class="letter Red">e</div>
+                                        <div class="number"></div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <a href="#">
+                                        <div class="cont_central">
+                                            <div class="letter Blue arrow">></div>
+                                            <div class="number">Następna</div>
+                                        </div>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+        </main>
+        <footer class="bottomest">
+            <div class="bottom">
+                <div class="locate">Polska<span class="location"><span class="dot"></span><b> 12-234, Miasto</b> - Z
+                        Twojego
+                        adresu internetowego - <a href="#">Użyj dokładnej lokalizacji</a> - <a href="#">Dowiedz się
+                            więcej</a></span></div>
             </div>
-            <p style="min-width: 329px; line-height: 28px; font-size: small;">Korzystaj z Google w tych językach: <a style="color:#1a0dab;">English</a>
-            </p>
-        </div>
-    </div>
-    </section>
-
-    <!--results-->
-    <div class="options">
-        <ul class="options1">
-            <span class="pic"><svg focusable="false" viewBox="0 0 24 24"><path fill="#34a853" d="M10 2v2a6 6 0 0 1 6 6h2a8 8 0 0 0-8-8"></path><path fill="#ea4335" d="M10 4V2a8 8 0 0 0-8 8h2c0-3.3 2.7-6 6-6"></path><path fill="#fbbc04" d="M4 10H2a8 8 0 0 0 8 8v-2c-3.3 0-6-2.69-6-6"></path><path fill="#4285f4" d="M22 20.59l-5.69-5.69A7.96 7.96 0 0 0 18 10h-2a6 6 0 0 1-6 6v2c1.85 0 3.52-.64 4.88-1.68l5.69 5.69L22 20.59"></path></svg></span>
-            <li class="active_option">Wszystko</li>
-            <span class="pic"><svg focusable="false" viewBox="0 0 24 24"><path d="M14 13l4 5H6l4-4 1.79 1.78L14 13zm-6.01-2.99A2 2 0 0 0 8 6a2 2 0 0 0-.01 4.01zM22 5v14a3 3 0 0 1-3 2.99H5c-1.64 0-3-1.36-3-3V5c0-1.64 1.36-3 3-3h14c1.65 0 3 1.36 3 3zm-2.01 0a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h7v-.01h7a1 1 0 0 0 1-1V5"></path></svg></span>
-            <li>Grafika</li>
-            <span class="pic"><svg focusable="false" viewBox="0 0 24 24"><path d="M12 11h6v2h-6v-2zm-6 6h12v-2H6v2zm0-4h4V7H6v6zm16-7.22v12.44c0 1.54-1.34 2.78-3 2.78H5c-1.64 0-3-1.25-3-2.78V5.78C2 4.26 3.36 3 5 3h14c1.64 0 3 1.25 3 2.78zM19.99 12V5.78c0-.42-.46-.78-1-.78H5c-.54 0-1 .36-1 .78v12.44c0 .42.46.78 1 .78h14c.54 0 1-.36 1-.78V12zM12 9h6V7h-6v2"></path></svg></span>
-            <li>Wiadomości</li>
-            <span class="pic"><svg focusable="false" viewBox="0 0 24 24"><path d="M10 16.5l6-4.5-6-4.5v9zM5 20h14a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1zm14.5 2H5a3 3 0 0 1-3-3V4.4A2.4 2.4 0 0 1 4.4 2h15.2A2.4 2.4 0 0 1 22 4.4v15.1a2.5 2.5 0 0 1-2.5 2.5"></path></svg></span>
-            <li>Wideo</li>
-            <span class="pic"><svg focusable="false" viewBox="0 0 16 16"><path d="M7.503 0c3.09 0 5.502 2.487 5.502 5.427 0 2.337-1.13 3.694-2.26 5.05-.454.528-.906 1.13-1.358 1.734-.452.603-.754 1.508-.98 1.96-.226.452-.377.829-.904.829-.528 0-.678-.377-.905-.83-.226-.451-.527-1.356-.98-1.959-.452-.603-.904-1.206-1.356-1.734C3.132 9.121 2 7.764 2 5.427 2 2.487 4.412 0 7.503 0zm0 1.364c-2.283 0-4.14 1.822-4.14 4.063 0 1.843.86 2.873 1.946 4.177.468.547.942 1.178 1.4 1.79.34.452.596.99.794 1.444.198-.455.453-.992.793-1.445.459-.61.931-1.242 1.413-1.803 1.074-1.29 1.933-2.32 1.933-4.163 0-2.24-1.858-4.063-4.139-4.063zm0 2.734a1.33 1.33 0 11-.001 2.658 1.33 1.33 0 010-2.658"></path></svg></span>
-            <li>Mapy</li>
-            <span class="pic2"><svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg></span>
-            <li>Więcej</li>
-            <li>Ustawienia</li>
-            <li>Narzędzia</li>
-        </ul>
-    </div>
-    <div class="results_area">
-        <p class="results_number">Około 40 500 000 wyników (0,74 s)</p>
-        <div class="search_result">
-            <a href=" " >
-                <p class="upper_info">context.reverso.net <span class="upper_info2">> tłumaczenie > polski-angielski > jakaś+inf... ▼</span></p>
-                <h3>jakaś informacja - Tłumaczenie na angielski - polskich ...</h3>
-            </a>
-            <p class="details">Dobrze, ale jeśli będzie u was <b>jakaś informacja</b>, ja podjadę jeszcze. If you'll have any info, I'll be back. Sure, come back.
-            </p>
-        </div>
-        <div class="search_result">
-            <a href=" " >
-                <p class="upper_info">context.reverso.net <span class="upper_info2">> tłumaczenie > polski-angielski > jakaś+inf... ▼</span></p>
-                <h3>jakaś informacja, - Tłumaczenie na angielski - polskich ...</h3>
-            </a>
-            <p class="details">Tłumaczenia w kontekście hasła "<b>jakaś informacja</b>," z polskiego na angielski od Reverso Context: Jeśli coś masz, jakaś informacja, która mogłaby pomóc...</p>
-        </div>
-        <div class="search_result">
-            <a href=" " >
-                <p class="upper_info">https://www.krolewska-akademia.pl <span class="upper_info2">> tekst-pierwszy ▼</span></p>
-                <h3>Jakaś informacja 1 | Królewska Akademia Biznesu i Dyplomacji</h3>
-            </a>
-            <p class="details"><b>Jakaś informacja</b> 1. 10 czerwca 2015 • Under: Bez kategorii · 0. biznes. FUNDACJA KORONY POLSKIEJ. Fundacja Korony Polskiej jest instytucją powołaną w ...</p>
-        </div>
-        <div class="search_result">
-            <a href=" " >
-                <p class="upper_info">https://es-la.facebook.com <span class="upper_info2">> AliorBankSA > posts > awa... ▼</span></p>
-                <h3>Jakub Dervill - Awaria!! gdzie jakas informacja ze dzis ...</h3>
-            </a>
-            <p class="details">Awaria!! gdzie <b>jakas informacja</b> ze dzis nastapila podobno awaria w calym kraju ze ani wplacic juz nie mowie o wyplaceniu kasy?? mam zostac bez kasy...</p>
-        </div>
-        <div class="search_result">
-            <a href=" " >
-                <p class="upper_info">https://ar-ar.facebook.com <span class="upper_info2">> wwwKrakowPL > posts</span></p>
-                <h3>Malwina Rzonca - Czy jest jakaś informacja telefoniczna ...</h3>
-            </a>
-            <p class="details">Czy jest <b>jakaś informacja</b> telefoniczna, dotycząca ograniczeń ruchu podczas ŚDM? Jeśli jest się mieszkańcem i ma się firmę w strefie ograniczonego ruchu,...
-            </p>
-        </div>
-        <div class="search_result">
-            <a href=" " >
-                <p class="upper_info">https://pl.wikipedia.org <span class="upper_info2">> wiki > Pomoc:Ponadczsowość ▼</span></p>
-                <h3>Pomoc:Ponadczasowość - Wikipedia, wolna encyklopedia</h3>
-            </a>
-            <p class="details">Jeżeli <b>jakaś informacja</b> może się stać nieaktualna – trzeba pilnować, by taka się nie stała, a gdy się jednak stanie – przeredagowywać tekst. „Ale ja aktualizuję ...
-            </p>
-        </div>
-        <div class="search_result">
-            <a href=" " >
-                <p class="upper_info">https://www.pocztowy.pl <span class="upper_info2">> kontakt ▼</span></p>
-                <h3>Kontakt | Bank Pocztowy</h3>
-            </a>
-            <p class="details">Masz pytania dotyczące oferty Banku, chciałbyś aktywować <b>jakąś</b> usługę lub złożyć ... Zadaj pytanie, wysyłając e-maila na adres <b>informacja</b>@pocztowy.pl.</p>
-        </div>
-        <div class="search_result">
-            <a href=" " >
-                <p class="upper_info">https://www.biznes.gov.pl <span class="upper_info2">> chce-zatrudnic-cudzoziemca ▼</span></p>
-                <h3>Informacja starosty o lokalnym rynku pracy | Biznes.gov.pl ...</h3>
-            </a>
-            <p class="details">Starosta wyda <b>informację</b> o możliwości zaspokojenia potrzeb kadrowych. Po przejrzeniu rejestru bezrobotnych, starosta poinformuje cię o tym czy <b>jakaś</b> osoba z ...
-
-            </p>
-        </div>
-        <div class="search_result">
-            <a href=" " >
-                <p class="upper_info">https://wwww.zus.pl <span class="upper_info2">> o-zus > komunikaty-techniczne ▼</span></p>
-                <h3>Komunikaty techniczne - Komunikaty - ZUS</h3>
-            </a>
-            <p class="details">Konto · Subkonto · <b>Informacja</b> o stanie konta ubezpieczonego w ZUS · OFE · Opis spraw. pokaż menu zwiń menu Pracujący w UE, EOG, Szwajcarii.
-            </p>
-        </div>
-        <div class="search_result">
-            <a href=" " >
-                <p class="upper_info">https://support.google.com <span class="upper_info2">> mail > answer ▼</span></p>
-                <h3>Odpowiedź z infromacją o urlopie lub nieobecności w biurze ...</h3>
-            </a>
-            <p class="details">Status Poza biurem możesz sprawdzić w Gmailu. Jeśli <b>jakaś</b> osoba jest poza biurem, Gmail pokazuje jej status, gdy piszesz do niej e-maila. Możesz wysłać e- ...
-            </p>
-        </div>
-
-        <br>
-        <div class="list">
-            <div class="first">G</div>
-            <div class="second">o</div>
-            <div class="yellow1">o</div>
-            <div class="yellow2">o</div>
-            <div class="yellow3">o</div>
-            <div class="yellow4">o</div>
-            <div class="yellow5">o</div>
-            <div class="yellow6">o</div>
-            <div class="yellow7">o</div>
-            <div class="yellow8">o</div>
-            <div class="yellow9">o</div>
-            <div class="blue">g</div>
-            <div class="green">l</div>
-            <div class="red">e</div>
-            <div class="number1">1</div>
-            <div class="number2">2</div>
-            <div class="number3">3</div>
-            <div class="number4">4</div>
-            <div class="number5">5</div>
-            <div class="number6">6</div>
-            <div class="number7">7</div>
-            <div class="number8">8</div>
-            <div class="number9">9</div>
-            <div class="number10">10</div>
-            <div class="next1">></div>
-            <div class="next2">Następna</div>
-        </div>
-    </div>
-    <footer class="foot">
+            <div class=" f-flex-container">
+                <section class="f-flex-item section-flex i1st">
+                    <a class="section-flex-item clean-link pad"
+                        href="https://about.google/?utm_source=google-PL&amp;utm_medium=referral&amp;utm_campaign=hp-footer&amp;fg=1">O
+                        nas</a>
+                    <a class="section-flex-item clean-link pad"
+                        href="https://www.google.com/intl/pl_pl/ads/?subid=ww-ww-et-g-awa-a-g_hpafoot1_1!o2&amp;utm_source=google.com&amp;utm_medium=referral&amp;utm_campaign=google_hpafooter&amp;fg=1">Reklamuj
+                        się</a>
+                    <a class="section-flex-item clean-link pad"
+                        href="https://www.google.com/services/?subid=ww-ww-et-g-awa-a-g_hpbfoot1_1!o2&amp;utm_source=google.com&amp;utm_medium=referral&amp;utm_campaign=google_hpbfooter&amp;fg=1">Dla
+                        firm</a>
+                    <a class="section-flex-item clean-link pad"
+                        href="https://google.com/search/howsearchworks/?fg=1">Jak
+                        działa wyszukiwania</a>
+                </section>
+                <section class="f-flex-item leafy">
+                    <a class="clean-link"
+                        href="https://sustainability.google/intl/pl/commitments-europe/?utm_source=googlehpfooter&amp;utm_medium=housepromos&amp;utm_campaign=bottom-footer&amp;utm_content=">
+                        <img class="leaf" src="Grafiki/leaf.svg">Neutralność węglowa od 2007 roku</a>
+                </section>
+                <section class="f-flex-item section-flex i3rd">
+                    <a class="section-flex-item clean-link additional"
+                        href="https://support.google.com/websearch/?p=ws_results_help&amp;hl=pl&amp;fg=1">Pomoc</a>
+                    <a class="section-flex-item clean-link additional" href="#">Prześlij opinię</a>
+                    <a class="section-flex-item clean-link"
+                        href="https://policies.google.com/privacy?hl=pl&amp;fg=1">Prywatność</a>
+                    <a class="section-flex-item clean-link"
+                        href="https://policies.google.com/terms?hl=pl&amp;fg=1">Warunki</a>
+                    <div class="section-flex-item menubutton">
+                        <button class="menu clean-link clean-button" aria-haspopup="true" id="menu1"
+                            aria-controls="menu2">Ustawienia</button>
+                        <ul class="menu-list" role="menu" id="menu2" aria-labelledby="menu1">
+                            <!--zeby to zrobic potrzeba chyba java scripta-->
+                            <li role="none"><a class="menu" tabindex="-1"
+                                    href="https://www.google.com/preferences?hl=pl&amp;fg=1" role="menuitem">Ustawienia
+                                    wyszukiwania</a></li>
+                            <li role="none"><a class="menu" tabindex="-1" href="/advanced_search?hl=pl&amp;fg=1"
+                                    role="menuitem">Szukanie zaawansowane</a></li>
+                            <li role="none"><a class="menu" tabindex="-1"
+                                    href="/history/privacyadvisor/search/unauth?utm_source=googlemenu&amp;fg=1"
+                                    role="menuitem">Twoje dane w wyszukiwarce</a></li>
+                            <li role="none"><a class="menu" tabindex="-1" href="/history/optout?hl=pl&amp;fg=1"
+                                    role="menuitem">Historia wyszukiwania</a></li>
+                            <li role="none"><a class="menu" tabindex="-1"
+                                    href="https://support.google.com/websearch/?p=ws_results_help&amp;hl=pl&amp;fg=1"
+                                    role="menuitem">Pomoc dotycząca wyszukiwania</a></li>
+                            <li class="menu" role="none"><button class="menu" role="menuitem">Prześlij opinię</button>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </footer>
         
-
-            <div class="footer1" style="font-size: 15px;">Polska</div>
-            <div class="footer2" style="font-size: 14px;">
-            <ul class="FUl1">
-                <li><a>O nas</a></li>
-                <li><a>Reklamuj się</a></li>
-                <li><a>Dla firm</a></li>
-                <li><a>Jak działa wyszukiwarka</a></li>
-            </ul>
-            <span class="span"><img src="leaf.png" height="14" /><a>Neutralność węglowa od 2007 roku</a></span>
-            <ul class="FUl2">
-                <li><a>Prywatność</a></li>
-                <li><a>Warunki</a></li>
-                <li><a>Ustawienia</a></li>
-            </ul>
-        </div>
-        <div class="footer3">
-            <div class="location">
-                <a class="items">Polska</a>
-                <a class="items"><b>Krowodrza, Kraków</b></a>
-                <a class="items">- Z twojego adresu internetowego</a>
-                <aa href="" class="items"> - Użyj dokładnej lokalizacji</aa>
-                <aa href="" class="items"> - Dowiedz się więcej</aa>
-            </div>
-            <div class="last">
-                <aa href="" class="items">Pomoc</aa>
-                <aa href="" class="items">Prześlij opinię</aa>
-                <aa href="" class="items">Prywatność</aa>
-                <aa href="" class="items">Warunki</aa>
-            </div>
-        </div>
-    </footer>
+    </div>
 
 </body>
-<script src="cities.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            googleSearch: '',
+            cities: window.cities,
+            focused: false,
+            change: false,
+        },
+        updated() {
+            this.$nextTick(() => {
 
-<script >
-var app = new Vue({ 
-    el: '#app',
-    data: {
-        inputHandler: '',
-        cities: window.cities,
-        filteredCities: []
-    },
-    computed: {
-        findCity(){
-            if(this.inputHandler != ''){
-            var a = window.cities.filter(obj => obj.name.includes(this.inputHandler))
-            a=a.slice(0,10)
-            this.filteredCities = a;
-            return this.filteredCities
-        }
-        }
-    },
-    updated: function() {
-        if(app.inputHandler !== '')
-            document.body.classList.add("results")
-      }
-});
+                if (this.change) {
+                    this.$refs.top.focus();
 
+                } else {
+
+                    this.$refs.bottom.focus();
+
+                }
+
+            });
+
+        },
+        computed: {
+            filteredCities: function () {
+                let result=this.cities.filter(city => city.name.includes(this.googleSearch));
+                if(result.length>10){
+                    return result.slice(1, 11);
+                }
+                else{
+                    return result;
+                }
+                
+            }
+        },
+        methods:{
+            boldenize(city){
+                let re = new RegExp(this.googleSearch,"gi");
+                let bolden="<b>"+city.name.replace(re, match=>{
+                     return "<span class='normal'>"+ match+"</span>";
+                    })+"</b>";
+                console.log(bolden);
+
+                return bolden;
+            },
+            enterClicked() {
+                this.change= true;
+
+             },
+             selected(i){
+                this.googleSearch=this.filteredCities[i].name;
+                this.enterClicked();
+             },
+             isActive(){
+                if(this.googleSearch.length==0){
+                    this.change=false;
+                }
+                return this.change;
+
+             }
+        }
+    })
 </script>
+
 </html>
