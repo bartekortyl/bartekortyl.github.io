@@ -35,7 +35,7 @@ Vue.component("v-autocompleter", {
     model: {
         event: 'enter'
     },
-    props: ['options', 'searchvalue'],
+    props: ['searchvalue'],
     data() {
         return {
             googleSearch: '',
@@ -45,6 +45,7 @@ Vue.component("v-autocompleter", {
             change: false,
             inFocus: -1,
             searchedInput: '',
+            res: ""
         }
     },
     computed:{
@@ -74,9 +75,9 @@ Vue.component("v-autocompleter", {
 
         },
         googleSearch: function () {
+
             this.createFilteredCities(this.update_filteredCities);
             this.update_filteredCities = true;
-            console.log(this.filteredCities);
 
             if (this.inFocus == -1) {
                 this.searchedInput = this.googleSearch;
@@ -91,7 +92,7 @@ Vue.component("v-autocompleter", {
             let bolden = "<b>" + city.name.replace(re, match => {
                 return "<span class='normal'>" + match + "</span>";
             }) + "</b>";
-            console.log(bolden);
+            //console.log(bolden);
 
             return bolden;
         },
@@ -128,9 +129,27 @@ Vue.component("v-autocompleter", {
                 this.inFocus = this.filteredCities.length - 1;
             }
         },
+        
         createFilteredCities(yes) {
             if (yes) {
-                let result = this.options.filter(city => city.name.includes(this.googleSearch));
+                let dataQuery = [];
+                function findResultsDebounced(inp) {
+                    //console.log('Fetch: ', inp);
+                    //console.log(`http://localhost/search.php?name=${inp}`);
+                    fetch(`http://localhost/search.php?name=${inp}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            //console.log('Data: ',data);
+                            data.forEach(element => {
+                                dataQuery.push(element)
+                            });
+                        });
+                }
+                findResultsDebounced(this.googleSearch)
+                console.log("dataQuery:",dataQuery)
+
+                
+                let result = dataQuery//this.options.filter(city => city.name.includes(this.googleSearch));
                 if (result.length > 10) {
                     this.filteredCities = result.slice(1, 11);
                 }
@@ -140,6 +159,8 @@ Vue.component("v-autocompleter", {
                 this.inFocus = -1;
             }
         },
+        
+            
         results() {
            
             if (this.isActive()) {
